@@ -1,0 +1,76 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Pan 1</title> 
+
+	<script type="text/javascript" src="js/sb-1.4.1.js">//this is the spacebrew library</script>
+
+</head>
+<body>
+    <script type="text/javascript">
+
+    //when everything (window, HTML, css, resources) is loaded, run the spacebrew setup
+    window.onload = function(){
+    	setupSpacebrew();
+    }
+
+var sb; //spacebrew global initialization 
+
+//setup spacebrew
+function setupSpacebrew () {
+	//a function that defines all the variables, servers, publishers and subscribers and defines a new function for when message arrive
+
+	sb = new Spacebrew.Client(); //this is a client
+	sb.name("Pan_Song_1"); //name the client
+	sb.server = "104.131.48.13"; //change this to change the server, e.g. for a local server
+
+	sb.addSubscribe("on&off", "boolean", "false"); //add a subscriber
+	sb.addSubscribe("volume", "vvolume"); //add a subscriber
+
+	var opts = ["guitar", "bass", "drums", "vocals"];
+	var id = opts[Math.floor(Math.random()*opts.length)];
+
+
+	sb.onBooleanMessage = onBooleanMessage; //override the blank function that is in the library with our own custom version
+	sb.onCustomMessage = onCustomMessage;
+
+	sb.connect(); //connect to the server
+
+}
+
+	//this is the message for incoming range data
+function onBooleanMessage (name, value) {
+	var myAudio = document.getElementById("sound");
+
+	if(value == true){
+	myAudio.play();
+
+	} else if(value == false){
+	myAudio.pause();
+
+	}
+}
+
+function onCustomMessage (name, value, type) {
+
+if (type == "vvolume"){
+	var volumes = JSON.parse(value);
+	var v0 = volumes.v0;
+	var v1 = volumes.v1;
+	var v2 = volumes.v2;
+	var v3 = volumes.v3;
+
+	var myAudio = document.getElementById("sound");
+	myAudio.volume = v0/1023;
+}
+
+}
+	</script>
+
+	<audio id="sound" preload>
+	  <source src="drums.mp3" type="audio/mpeg">
+	Your browser does not support the audio element.
+	</audio>
+
+</body>
+</html>
