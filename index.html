@@ -1,0 +1,218 @@
+<html> 
+<head> 
+	<title>VVolume</title> 
+
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+	<script type="text/javascript" src="js/sb-1.4.1.js"></script>
+
+    <script type="text/javascript">
+
+    	// when page loads call spacebrew setup function 
+		$(window).on("load", setupSpacebrew);
+
+		// wher the jquery mobile is ready to initialize the UI call the setUI function 
+		$(document).bind("pageinit", setupUI);
+
+		// Spacebrew Object
+		var sb
+			, app_name = "slider example"
+			, values = {} 
+			;
+
+		/**
+		 * setupSpacebrew Function that creates and configures the connection to the Spacebrew server.
+		 * 				  It is called when the page loads.
+		 */
+		function setupSpacebrew (){
+			console.log("Setting up spacebrew connection");
+			sb = new Spacebrew.Client();
+
+			sb.name("VolumeControlStation");
+			sb.server = "104.131.48.13";
+			sb.description("Change Volume.");
+
+			// configure the publication and subscription feeds
+			sb.addPublish( "on&off", "boolean", "false" );
+			sb.addPublish( "volume", "vvolume", {v0:500, v1:500, v2:500, v3:500} );
+
+
+
+			// override Spacebrew events - this is how you catch events coming from Spacebrew
+			sb.onRangeMessage = onRangeMessage;
+			sb.onOpen = onOpen;
+
+			window.onkeyup = function(){
+				onKeyUp();
+			}
+			// connect to spacbrew
+			sb.connect();
+		};
+
+		/**
+		 * Function that is called when Spacebrew connection is established
+		 */
+		function onOpen() {
+			var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+			if (sb.name() === app_name) {
+				message += "<br>You can customize this app's name in the query string by adding <strong>name=your_app_name</strong>."
+			}
+			$("#name").html( message );
+		}
+		var isOn = false;
+
+		function onKeyUp(){
+			isOn = !isOn;
+			sb.send("on&off", "boolean", isOn ? "true" : "false");
+			console.log("send on&Off: "+ isOn);
+		}
+
+
+
+		/**
+		 * setupUI Function that create the event listeners for the sliders. It creates an callback
+		 * 		   function that sends a spacebrew message whenever an slide event is received.
+		 */
+
+		 var volumes = [500, 500, 500, 500];
+
+		function setupUI() {
+			console.log("Setting up the UI listeners");
+			// when the slider state changes it sends a message to spacebrew
+			$(".volume0").bind( "change", function(event, ui) {
+				if (values[event.target.id] != event.target.value) {
+					if( event.target.id == "volume0"){
+						volumes[0] = event.target.value;
+					}else if( event.target.id =="volume1"){
+						volumes[1] = event.target.value;
+					}else if( event.target.id == "volume2" ){
+						volumes[2] = event.target.value;
+					}else if( event.target.id =="volume3"){
+						volumes[3] = event.target.value;
+					}
+
+					var vvv = {v0:volumes[0],v1:volumes[1],v2:volumes[2],v3:volumes[3]}
+
+					sb.send("volume", "vvolume", JSON.stringify(vvv) );
+					console.log("sending volumes:"+vvv);
+
+				}
+			});
+
+			$(".volume1").bind( "change", function(event, ui) {
+				if (values[event.target.id] != event.target.value) {
+					if( event.target.id == "volume0"){
+						volumes[0] = event.target.value;
+					}else if( event.target.id =="volume1"){
+						volumes[1] = event.target.value;
+					}else if( event.target.id == "volume2" ){
+						volumes[2] = event.target.value;
+					}else if( event.target.id =="volume3"){
+						volumes[3] = event.target.value;
+					}
+
+					var vvv = {v0:volumes[0],v1:volumes[1],v2:volumes[2],v3:volumes[3]}
+
+					sb.send("volume", "vvolume", JSON.stringify(vvv) );
+					console.log("sending volumes:"+vvv);
+
+				}
+			});
+			$(".volume2").bind( "change", function(event, ui) {
+				if (values[event.target.id] != event.target.value) {
+					if( event.target.id == "volume0"){
+						volumes[0] = event.target.value;
+					}else if( event.target.id =="volume1"){
+						volumes[1] = event.target.value;
+					}else if( event.target.id == "volume2" ){
+						volumes[2] = event.target.value;
+					}else if( event.target.id =="volume3"){
+						volumes[3] = event.target.value;
+					}
+
+					var vvv = {v0:volumes[0],v1:volumes[1],v2:volumes[2],v3:volumes[3]}
+
+					sb.send("volume", "vvolume", JSON.stringify(vvv) );
+					console.log("sending volumes:"+vvv);
+
+				}
+			});
+			$(".volume3").bind( "change", function(event, ui) {
+				if (values[event.target.id] != event.target.value) {
+					if( event.target.id == "volume0"){
+						volumes[0] = event.target.value;
+					}else if( event.target.id =="volume1"){
+						volumes[1] = event.target.value;
+					}else if( event.target.id == "volume2" ){
+						volumes[2] = event.target.value;
+					}else if( event.target.id =="volume3"){
+						volumes[3] = event.target.value;
+					}
+
+					var vvv = {v0:volumes[0],v1:volumes[1],v2:volumes[2],v3:volumes[3]}
+
+					sb.send("volume", "vvolume", JSON.stringify(vvv) );
+					console.log("sending volumes:"+vvv);
+
+				}
+			});
+
+		}
+
+		/**
+		 * onRangeMessage Function that is called whenever new spacebrew range messages are received.
+		 * 				  It accepts two parameters:
+		 * @param  {String} name  	Holds name of the subscription feed channel
+		 * @param  {Integer} value 	Holds value received from the subscription feed
+		 */
+		function onRangeMessage(name, value){
+			console.log("Received new range message ", value);
+			$("#"+name).volume('refresh', value);
+		};
+
+		var nameList = [];
+
+		function onStringMessage(name, value){
+			nameList.push(value);
+		}
+
+
+
+
+    </script>
+
+</head> 
+<body> 
+
+<div data-role="page">
+	<div data-role="header">
+		<h1>SpaceBrew Sliders</h1>
+	</div>
+
+	<div data-role="content">	
+		<form id="defaults">
+			<label for="volume0">Instrument 0:</label>
+			<input type="range" class="volume0" name="volume0" id="volume0" value="500" min="0" max="1023"  />
+
+			<label for="volume1">Instrument 1:</label>
+			<input type="range" class="volume1" name="volume1" id="volume1" value="500" min="0" max="1023"  />
+
+			<label for="volume2">Instrument 2:</label>
+			<input type="range" class="volume2" name="volume2" id="volume2" value="500" min="0" max="1023"  />
+
+			<label for="volume3">Instrument 3:</label>
+			<input type="range" class="volume3" name="volume3" id="volume3" value="500" min="0" max="1023"  />
+		</form>
+
+
+
+		</br></br>
+		<div id="name">Trying to connect</div>
+
+	</div><!-- /content -->
+</div><!-- /page -->
+
+</body>
+</html>
